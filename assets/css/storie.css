@@ -1,0 +1,7 @@
+.story-media,
+.story-logo-slot {
+  display: none !important;
+}
+.story {
+  display: block;
+}
