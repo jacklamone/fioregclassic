@@ -109,39 +109,16 @@
     });
   });
 
-  /* ---------- Form contatti (Netlify Forms) ---------- */
-  var form = document.querySelector("form[data-netlify]");
-  if (form && window.fetch) {
-    var success = document.querySelector(".form-success");
-    var error = form.querySelector(".form-error");
-    form.addEventListener("submit", function (e) {
-      if (!form.checkValidity()) return;
-      e.preventDefault();
-      var button = form.querySelector('button[type="submit"]');
-      var label = button.innerHTML;
-      button.disabled = true;
-      button.textContent = "Invio in corso…";
-      if (error) error.hidden = true;
-      fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(new FormData(form)).toString()
-      })
-        .then(function (res) {
-          if (!res.ok) throw new Error(res.status);
-          form.hidden = true;
-          if (success) {
-            success.hidden = false;
-            success.setAttribute("tabindex", "-1");
-            success.focus();
-          }
-        })
-        .catch(function () {
-          button.disabled = false;
-          button.innerHTML = label;
-          if (error) error.hidden = false;
-        });
-    });
+  /* ---------- Form contatti: messaggio di conferma al ritorno ---------- */
+  if (new URLSearchParams(window.location.search).get("inviato") === "1") {
+    var sentForm = document.querySelector("form[name='contatti-studio-fiore']");
+    var sentOk = document.querySelector(".form-success");
+    if (sentForm) sentForm.hidden = true;
+    if (sentOk) {
+      sentOk.hidden = false;
+      sentOk.setAttribute("tabindex", "-1");
+      sentOk.focus();
+    }
   }
 
   /* ---------- Anno nel footer ---------- */
@@ -175,4 +152,24 @@
   toTop.addEventListener("click", function () {
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   });
+
+  /* ---------- Scrivici: si alza quando incontra il footer ---------- */
+  var wa = document.querySelector(".wa-float");
+  var footerBar = document.querySelector(".footer-bottom");
+  function placeWa() {
+    if (!wa || !footerBar) return;
+    var vh = window.innerHeight;
+    var top = footerBar.getBoundingClientRect().top;
+    var base = 18;
+    var needed = vh - top + 14;
+    var lift = base;
+    if (needed > base) {
+      var aboveArrow = 76 + 52 + 14;
+      lift = Math.max(needed, aboveArrow);
+    }
+    wa.style.setProperty("--wa-lift", lift + "px");
+  }
+  placeWa();
+  window.addEventListener("scroll", placeWa, { passive: true });
+  window.addEventListener("resize", placeWa);
 })();
